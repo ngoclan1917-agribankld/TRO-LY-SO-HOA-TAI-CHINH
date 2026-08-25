@@ -126,16 +126,18 @@ def format_money_editor(value):
 def normalize_money_widget(key):
     raw = st.session_state.get(key, "0")
     digits = re.sub(r"[^0-9]", "", str(raw))
-    if not digits:
-        digits = "0"
     digits = digits.lstrip("0") or "0"
     st.session_state[key] = f"{int(digits):,}".replace(",", ".")
 
 
 def money_input(label, key, default=0):
-    """Nhập tiền bằng text để tránh StreamlitInvalidNumberFormatError.
-    Giá trị mặc định là 0; sau mỗi lần nhập, số được chuẩn hóa thành 1.000.000...
-    Người dùng chỉ cần gõ chữ số, không cần gõ dấu phân cách.
+    """Ô nhập tiền an toàn cho Streamlit.
+
+    - Widget là text_input, không dùng number_input để tránh lỗi format.
+    - Giá trị ban đầu là 0.
+    - Người dùng chỉ cần nhập chữ số.
+    - Khi thay đổi, hệ thống tự chuẩn hóa 1.000 / 1.000.000 / ...
+    - Không bao giờ gán lại session_state[key] sau khi widget đã được tạo.
     """
     if key not in st.session_state:
         st.session_state[key] = format_money_editor(default)
@@ -360,6 +362,9 @@ elif st.session_state.page == "💰 Sổ tay Dòng tiền":
         st.session_state.cashflows = pd.DataFrame(columns=["Ngày", "Loại", "Nhóm", "Nội dung", "Số tiền"])
 
     st.markdown('<div class="section-header">NHẬP DỮ LIỆU</div>', unsafe_allow_html=True)
+    if st.session_state.pop("cash_reset_form", False):
+        st.session_state["cash_amount"] = "0"
+        st.session_state["cash_content"] = ""
     cols = st.columns([1.15, 1.0, 1.35, 1.75, 1.3, .8])
     with cols[0]:
         d = date_input_vn("Ngày", "cash_date")
@@ -380,9 +385,8 @@ elif st.session_state.page == "💰 Sổ tay Dòng tiền":
         if st.button("Thêm", key="cash_add", use_container_width=True):
             row = pd.DataFrame([[pd.Timestamp(d), typ, group, content, amount]], columns=st.session_state.cashflows.columns)
             st.session_state.cashflows = pd.concat([st.session_state.cashflows, row], ignore_index=True)
-            st.session_state.cash_amount = "0"
-            st.session_state.cash_content = ""
-            st.success("Đã thêm giao dịch.")
+            st.session_state["cash_reset_form"] = True
+            st.rerun()
 
     upload_cols = st.columns([1, 2])
     with upload_cols[0]:
@@ -479,6 +483,10 @@ elif st.session_state.page == "⚙️ Tính Khấu hao":
 
     if "assets" not in st.session_state:
         st.session_state.assets = []
+    if st.session_state.pop("dep_reset_form", False):
+        st.session_state["dep_name"] = ""
+        st.session_state["dep_cost"] = "0"
+        st.session_state["dep_salvage"] = "0"
 
     cols = st.columns([1.35, 1.2, 1.2, 1.25, 1.25, .7, .7])
     with cols[0]:
@@ -515,10 +523,8 @@ elif st.session_state.page == "⚙️ Tính Khấu hao":
                 "Thời gian sử dụng (năm)": int(years),
                 "Ngày mua": purchase.strftime("%d/%m/%Y"),
             })
-            st.session_state.dep_name = ""
-            st.session_state.dep_cost = "0"
-            st.session_state.dep_salvage = "0"
-            st.success("Đã thêm tài sản.")
+            st.session_state["dep_reset_form"] = True
+            st.rerun()
 
     if st.session_state.assets:
         today = date.today()
