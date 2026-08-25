@@ -278,7 +278,9 @@ with st.sidebar:
         "📈 Đánh giá Hiệu quả Đầu tư": "ĐÁNH GIÁ HIỆU QUẢ ĐẦU TƯ",
     }
     selected = st.radio(
-        "", list(pages.keys()), index=list(pages.keys()).index(st.session_state.page),
+        "Chọn mục trong danh mục",
+        list(pages.keys()),
+        index=list(pages.keys()).index(st.session_state.page),
         label_visibility="collapsed",
     )
     st.session_state.page = selected
