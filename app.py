@@ -41,10 +41,11 @@ st.markdown(
     --soft: #f7f8fa;
     --text: #202124;
 }
-.block-container { padding-top: 0.35rem; max-width: 1450px; }
+.block-container { padding-top: 0.08rem; max-width: 1450px; }
 .app-title {
-    color: var(--red); text-align: center; font-size: 2.25rem;
-    font-weight: 900; margin: 0 0 0.55rem 0; letter-spacing: .3px;
+    color: var(--red); text-align: center; font-size: 2.05rem;
+    line-height: 1.15;
+    font-weight: 900; margin: 0 0 0.65rem 0; letter-spacing: .3px;
 }
 .app-note { text-align:center; color:#60656b; font-size:.92rem; margin-bottom:1rem; }
 .section-header {
@@ -125,29 +126,33 @@ def fmt_money_input(value):
     return f"{value:,}".replace(",", ".")
 
 
-def money_input(label, key, default=0, help_text=None):
-    """
-    Ô nhập tiền bằng text để tránh StreamlitInvalidNumberFormatError.
-    - Hiển thị mặc định 0.
-    - Người dùng có thể sửa bằng số không có dấu.
-    - Dữ liệu được chuẩn hóa sau khi nhập.
-    - Không có nút +/-.
-    Lưu ý: Streamlit widget gốc không có hook focus để tự xóa 0 ngay khi click.
-    Vì vậy khi ô còn đúng "0", gõ chữ số đầu tiên sẽ thay thế giá trị hiện tại theo
-    hành vi tự nhiên của ô nhập; không dùng number_input để tránh lỗi format.
+def _normalize_money_widget(key):
+    """Chuẩn hóa nội dung ô tiền sau mỗi lần người dùng kết thúc lượt nhập."""
+    raw = st.session_state.get(key, "")
+    digits = re.sub(r"\D", "", str(raw))
+    digits = digits.lstrip("0") or "0"
+    st.session_state[key] = f"{int(digits):,}".replace(",", ".")
+
+
+def money_input(label, key, default=0):
+    """Ô nhập tiền an toàn:
+    - Mặc định hiển thị 0.
+    - Người dùng chỉ cần nhập chữ số, không cần tự gõ dấu phân cách.
+    - Khi kết thúc lượt nhập, hệ thống tự bỏ số 0 thừa ở đầu và định dạng
+      thành 1.000, 1.000.000, 1.000.000.000...
+    - Không có nút +/- và không dùng number_input format, tránh
+      StreamlitInvalidNumberFormatError.
     """
     if key not in st.session_state:
-        st.session_state[key] = "0" if default == 0 else str(int(default))
-    value = st.text_input(label, key=key, help=None)
-    numeric = clean_money_text(value)
-    # Hiển thị gợi ý định dạng, không dùng dấu trong dữ liệu nhập.
-    st.caption("Nhập số tiền. Giá trị được hiển thị dạng số nguyên; kết quả bên dưới có phân cách hàng nghìn.")
-    return numeric
+        st.session_state[key] = fmt_money_input(default)
 
-
-def date_input_vn(label, key, value=None):
-    d = st.date_input(label, value=value or date.today(), format="DD/MM/YYYY", key=key)
-    return d
+    st.text_input(
+        label,
+        key=key,
+        on_change=_normalize_money_widget,
+        args=(key,),
+    )
+    return clean_money_text(st.session_state.get(key, "0"))
 
 
 def get_gemini_key():
