@@ -40,16 +40,16 @@ st.markdown(
     --soft: #f7f8fa;
     --text: #202124;
 }
-.block-container { padding-top: 0.02rem; max-width: 1450px; }
+.block-container { padding-top: 0.08rem; max-width: 1450px; }
 .app-title {
     color: var(--red); text-align: center; font-size: 2.05rem;
-    line-height: 1.15; font-weight: 900; margin: 0 0 .75rem 0;
-    letter-spacing: .2px;
+    line-height: 1.08; font-weight: 900; margin: 0 0 .65rem 0;
+    letter-spacing: .15px;
 }
 .section-header {
     font-size: 1.42rem; font-weight: 900; color: var(--red);
-    border-bottom: 2px solid var(--red); padding-bottom: .32rem;
-    margin: .45rem 0 .8rem;
+    border-bottom: 2px solid var(--red); padding-bottom: .30rem;
+    margin: .38rem 0 .72rem;
 }
 .stTextInput label, .stNumberInput label, .stDateInput label,
 .stSelectbox label, .stFileUploader label, .stTextArea label,
@@ -57,34 +57,34 @@ st.markdown(
     font-weight: 800 !important;
 }
 .sidebar-title { font-size: 1.52rem !important; font-weight: 900 !important; color: var(--red) !important; }
-.sidebar-item label { font-size: 1.05rem !important; font-weight: 900 !important; }
 .sidebar-help { font-size: .9rem; line-height: 1.55; color: #555; }
 .card-link {
     display: block; text-decoration: none !important; color: inherit !important;
-    border: 1px solid var(--line); border-radius: 14px; padding: 1rem;
+    border: 1px solid var(--line); border-radius: 14px; padding: .95rem 1rem;
     background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.08);
-    height: 100%; transition: transform .15s ease, box-shadow .15s ease;
+    min-height: 145px; transition: transform .15s ease, box-shadow .15s ease;
 }
 .card-link:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,.12); border-color: #c9a1a1; }
-.card-title { color: var(--red); font-size: 1.35rem; font-weight: 900; margin-bottom: .5rem; }
-.card-text { line-height: 1.55; }
+.card-title { color: var(--red); font-size: 1.34rem; font-weight: 900; margin-bottom: .45rem; }
+.card-text { line-height: 1.52; font-size: .95rem; }
 .rule-box {
     border: 1px solid #e0bdbd; border-left: 5px solid var(--red);
-    border-radius: 12px; padding: 1rem 1.1rem; background: #fff8f8;
-    margin: .9rem 0 1rem;
+    border-radius: 12px; padding: .95rem 1.05rem; background: #fff8f8;
+    margin: .82rem 0 1rem;
 }
 .metric-box {
-    border: 1px solid var(--line); border-radius: 12px; padding: .75rem .9rem;
+    border: 1px solid var(--line); border-radius: 12px; padding: .72rem .85rem;
     background: #fff; min-height: 92px; box-shadow: 0 2px 8px rgba(0,0,0,.04);
 }
-.metric-label { color: #656b73; font-size: .87rem; font-weight: 800; }
-.metric-value { color: #111827; font-size: 1.3rem; font-weight: 900; margin-top: .2rem; }
-.term-title { font-size: 1.05rem; font-weight: 900; color: var(--red); }
-.term-desc { font-size: .9rem; line-height: 1.48; margin: .25rem 0 .65rem; }
+.metric-label { color: #656b73; font-size: .84rem; font-weight: 800; }
+.metric-value { color: #111827; font-size: 1.28rem; font-weight: 900; margin-top: .18rem; }
+.term-title { font-size: 1.03rem; font-weight: 900; color: var(--red); }
+.term-desc { font-size: .9rem; line-height: 1.45; margin: .22rem 0 .58rem; }
 .ai-box {
     border: 1px solid #c8d7eb; border-left: 5px solid var(--blue);
     padding: .9rem 1rem; border-radius: 10px; background: #f6f9ff;
 }
+.data-table-title { font-size: 1.08rem; font-weight: 900; color: #333; margin-top: .55rem; margin-bottom: .3rem; }
 </style>
 """,
     unsafe_allow_html=True,
@@ -109,7 +109,7 @@ def percent(value):
 def clean_money_text(value):
     if value is None:
         return 0.0
-    raw = str(value).strip().replace("đ", "").replace("Đ", "").replace(".", "").replace(",", "")
+    raw = str(value).strip().replace("đ", "").replace("Đ", "")
     digits = re.sub(r"[^0-9]", "", raw)
     return float(digits) if digits else 0.0
 
@@ -124,15 +124,12 @@ def format_money_editor(value):
 
 def normalize_money_widget(key):
     raw = st.session_state.get(key, "")
-    digits = re.sub(r"[^0-9]", "", str(raw))
-    digits = digits.lstrip("0")
+    digits = re.sub(r"[^0-9]", "", str(raw)).lstrip("0")
     st.session_state[key] = f"{int(digits):,}".replace(",", ".") if digits else ""
 
 
 def money_input(label, key, default=0, placeholder="0"):
-    """Ô tiền dạng text: 0 chỉ là placeholder chìm; không có +/-.
-    Người dùng nhập chữ số thuần; sau mỗi lần rời ô, số được chuẩn hóa có phân cách hàng nghìn.
-    """
+    # 0 chỉ là placeholder chìm; người dùng click vào và nhập số mới ngay.
     if key not in st.session_state:
         st.session_state[key] = format_money_editor(default)
     st.text_input(
@@ -149,6 +146,14 @@ def date_input_vn(label, key, default=None):
     if default is None:
         default = date.today()
     return st.date_input(label, value=default, format="DD/MM/YYYY", key=key)
+
+
+def dataframe_to_excel_bytes(sheets):
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        for name, df in sheets.items():
+            df.to_excel(writer, sheet_name=str(name)[:31], index=False)
+    return output.getvalue()
 
 
 def get_gemini_key():
@@ -190,14 +195,6 @@ Không thay thế kế toán, kiểm toán hoặc thẩm định chuyên môn.
         return response.text or "AI không trả về nội dung."
     except Exception as exc:
         return f"Không thể gọi Gemini API lúc này: {exc}"
-
-
-def dataframe_to_excel_bytes(sheets):
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine="openpyxl") as writer:
-        for name, df in sheets.items():
-            df.to_excel(writer, sheet_name=str(name)[:31], index=False)
-    return output.getvalue()
 
 
 def npv(rate, cashflows):
@@ -258,29 +255,8 @@ def compute_wacc(equity, debt, cost_equity, cost_debt, tax):
     return e * cost_equity + d * cost_debt * (1 - tax)
 
 
-def query_page_to_state():
-    mapping = {
-        "tong-quan": "🏠 Tổng quan",
-        "dong-tien": "💰 Sổ tay Dòng tiền",
-        "khau-hao": "⚙️ Tính Khấu hao",
-        "dau-tu": "📈 Đánh giá Hiệu quả Đầu tư",
-    }
-    requested = st.query_params.get("page")
-    if requested in mapping:
-        st.session_state.page = mapping[requested]
-
-
-def navigate_query(slug):
-    st.query_params["page"] = slug
-    st.rerun()
-
-
-if "page" not in st.session_state:
-    st.session_state.page = "🏠 Tổng quan"
-query_page_to_state()
-
 # =========================
-# DANH MỤC
+# ĐIỀU HƯỚNG
 # =========================
 pages = {
     "🏠 Tổng quan": "tong-quan",
@@ -288,6 +264,14 @@ pages = {
     "⚙️ Tính Khấu hao": "khau-hao",
     "📈 Đánh giá Hiệu quả Đầu tư": "dau-tu",
 }
+slug_to_page = {v: k for k, v in pages.items()}
+
+if "page" not in st.session_state:
+    st.session_state.page = "🏠 Tổng quan"
+
+requested = st.query_params.get("page")
+if requested in slug_to_page:
+    st.session_state.page = slug_to_page[requested]
 
 with st.sidebar:
     st.markdown('<div class="sidebar-title">DANH MỤC</div>', unsafe_allow_html=True)
@@ -303,7 +287,6 @@ with st.sidebar:
         list(pages.keys()),
         index=list(pages.keys()).index(st.session_state.page),
         label_visibility="collapsed",
-        key="navigation_radio",
     )
     if selected != st.session_state.page:
         st.session_state.page = selected
@@ -323,8 +306,9 @@ if st.session_state.page == "🏠 Tổng quan":
     ]
     for col, (title, desc, slug) in zip(cards, card_data):
         with col:
+            # Anchor không có target => luôn chuyển trong cùng tab.
             st.markdown(
-                f'<a class="card-link" href="?page={slug}">'
+                f'<a class="card-link" href="?page={slug}" aria-label="Mở {title}">'
                 f'<div class="card-title">{title}</div><div class="card-text">{desc}</div></a>',
                 unsafe_allow_html=True,
             )
@@ -343,11 +327,14 @@ elif st.session_state.page == "💰 Sổ tay Dòng tiền":
     st.markdown('<div class="section-header">SỔ TAY DÒNG TIỀN</div>', unsafe_allow_html=True)
     if "cashflows" not in st.session_state:
         st.session_state.cashflows = pd.DataFrame(columns=["Ngày", "Loại", "Nhóm", "Nội dung", "Số tiền"])
+    if "cash_calculated" not in st.session_state:
+        st.session_state.cash_calculated = False
 
     st.markdown('<div class="section-header">NHẬP DỮ LIỆU</div>', unsafe_allow_html=True)
     if st.session_state.pop("cash_reset_form", False):
-        st.session_state["cash_amount"] = ""
+        # Reset ở đầu một lượt chạy, trước khi widget được tạo.
         st.session_state["cash_content"] = ""
+        st.session_state["cash_amount"] = ""
 
     cols = st.columns([1.15, 1.0, 1.35, 1.75, 1.3, .8])
     with cols[0]:
@@ -363,13 +350,23 @@ elif st.session_state.page == "💰 Sổ tay Dòng tiền":
     with cols[5]:
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("Thêm", key="cash_add", use_container_width=True):
-            row = pd.DataFrame([[pd.Timestamp(d), typ, group, content, amount]], columns=st.session_state.cashflows.columns)
+            row = pd.DataFrame([[pd.Timestamp(d), typ, group, content.strip(), amount]], columns=st.session_state.cashflows.columns)
             st.session_state.cashflows = pd.concat([st.session_state.cashflows, row], ignore_index=True)
             st.session_state.cash_reset_form = True
             st.session_state.cash_calculated = False
             st.rerun()
 
-    upload_cols = st.columns([1, 2, 1])
+    # Bảng tổng hợp luôn hiển thị ngay dưới vùng nhập liệu.
+    st.markdown('<div class="data-table-title">BẢNG TỔNG HỢP DÒNG TIỀN ĐÃ NHẬP</div>', unsafe_allow_html=True)
+    cash_display = st.session_state.cashflows.copy()
+    if not cash_display.empty:
+        cash_display["Ngày"] = pd.to_datetime(cash_display["Ngày"], errors="coerce", dayfirst=True)
+        cash_display["Số tiền"] = pd.to_numeric(cash_display["Số tiền"].apply(clean_money_text), errors="coerce").fillna(0)
+        cash_display["Ngày"] = cash_display["Ngày"].dt.strftime("%d/%m/%Y")
+        cash_display["Số tiền"] = cash_display["Số tiền"].map(money)
+    st.dataframe(cash_display, use_container_width=True, hide_index=True)
+
+    upload_cols = st.columns([1.2, 2.3, 1.0])
     with upload_cols[0]:
         uploaded = st.file_uploader("Tải dữ liệu Excel/CSV", type=["xlsx", "csv"], key="cash_upload")
     with upload_cols[1]:
@@ -378,7 +375,7 @@ elif st.session_state.page == "💰 Sổ tay Dòng tiền":
         if st.button("Tính toán", key="cash_calculate", use_container_width=True):
             st.session_state.cash_calculated = True
 
-    if uploaded is not None:
+    if uploaded is not None and st.session_state.get("cash_last_uploaded_name") != uploaded.name:
         try:
             imported = pd.read_csv(uploaded) if uploaded.name.lower().endswith(".csv") else pd.read_excel(uploaded)
             required = {"Ngày", "Loại", "Số tiền"}
@@ -389,8 +386,9 @@ elif st.session_state.page == "💰 Sổ tay Dòng tiền":
                     if col not in imported.columns:
                         imported[col] = ""
                 st.session_state.cashflows = imported[["Ngày", "Loại", "Nhóm", "Nội dung", "Số tiền"]].copy()
+                st.session_state.cash_last_uploaded_name = uploaded.name
                 st.session_state.cash_calculated = False
-                st.success("Đã tải dữ liệu thành công. Bấm Tính toán để cập nhật kết quả.")
+                st.rerun()
         except Exception as exc:
             st.error(f"Không thể đọc file: {exc}")
 
@@ -433,11 +431,11 @@ elif st.session_state.page == "💰 Sổ tay Dòng tiền":
             fig2.update_yaxes(tickformat=",.0f", separatethousands=True)
             st.plotly_chart(fig2, use_container_width=True)
 
-            st.dataframe(df.assign(Ngày=df["Ngày"].dt.strftime("%d/%m/%Y"), **{"Số tiền": df["Số tiền"].map(money)}), use_container_width=True, hide_index=True)
-
             action_cols = st.columns(2)
             with action_cols[0]:
-                export = dataframe_to_excel_bytes({"So_tay_dong_tien": df})
+                export_df = df.copy()
+                export_df["Ngày"] = export_df["Ngày"].dt.strftime("%d/%m/%Y")
+                export = dataframe_to_excel_bytes({"So_tay_dong_tien": export_df})
                 st.download_button("Tải Excel", export, "so_tay_dong_tien.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True)
             with action_cols[1]:
                 if st.button("Phân tích bằng AI", key="cash_ai", use_container_width=True):
@@ -451,11 +449,14 @@ elif st.session_state.page == "⚙️ Tính Khấu hao":
     st.markdown('<div class="section-header">TÍNH KHẤU HAO</div>', unsafe_allow_html=True)
     if "assets" not in st.session_state:
         st.session_state.assets = []
+    if "dep_calculated" not in st.session_state:
+        st.session_state.dep_calculated = False
 
     st.markdown('<div class="section-header">NHẬP THÔNG TIN TÀI SẢN</div>', unsafe_allow_html=True)
     if st.session_state.pop("dep_reset_form", False):
-        for key in ["dep_name", "dep_cost", "dep_salvage"]:
-            st.session_state[key] = "" if key != "dep_cost" and key != "dep_salvage" else ""
+        st.session_state["dep_name"] = ""
+        st.session_state["dep_cost"] = ""
+        st.session_state["dep_salvage"] = ""
 
     cols = st.columns([1.55, 1.25, 1.25, .95, 1.25, .8])
     with cols[0]:
@@ -478,17 +479,35 @@ elif st.session_state.page == "⚙️ Tính Khấu hao":
             elif cost <= 0:
                 st.error("Nguyên giá phải lớn hơn 0.")
             else:
-                st.session_state.assets.append({"Tên tài sản": asset_name.strip(), "Nguyên giá": cost, "Giá trị thu hồi": salvage, "Thời gian sử dụng (năm)": int(years), "Ngày mua": purchase.strftime("%d/%m/%Y")})
+                st.session_state.assets.append({
+                    "Tên tài sản": asset_name.strip(),
+                    "Nguyên giá": cost,
+                    "Giá trị thu hồi": salvage,
+                    "Thời gian sử dụng (năm)": int(years),
+                    "Ngày mua": purchase.strftime("%d/%m/%Y"),
+                })
                 st.session_state.dep_reset_form = True
                 st.session_state.dep_calculated = False
                 st.rerun()
+
+    # Bảng tài sản luôn hiển thị ngay dưới vùng nhập liệu.
+    st.markdown('<div class="data-table-title">BẢNG TỔNG HỢP TÀI SẢN ĐÃ NHẬP</div>', unsafe_allow_html=True)
+    assets_df = pd.DataFrame(st.session_state.assets)
+    if not assets_df.empty:
+        display_assets = assets_df.copy()
+        display_assets["Nguyên giá"] = display_assets["Nguyên giá"].map(money)
+        display_assets["Giá trị thu hồi"] = display_assets["Giá trị thu hồi"].map(money)
+    else:
+        display_assets = assets_df
+    st.dataframe(display_assets, use_container_width=True, hide_index=True)
 
     calc_col = st.columns([1, 5])
     with calc_col[0]:
         if st.button("Tính toán", key="dep_calculate", use_container_width=True):
             st.session_state.dep_calculated = True
+
     if st.session_state.assets and not st.session_state.get("dep_calculated", False):
-        st.info("Đã thêm tài sản. Bấm Tính toán để cập nhật kết quả.")
+        st.info("Đã có dữ liệu tài sản. Bấm Tính toán để cập nhật kết quả khấu hao.")
 
     if st.session_state.assets and st.session_state.get("dep_calculated", False):
         today = date.today()
@@ -536,6 +555,9 @@ elif st.session_state.page == "⚙️ Tính Khấu hao":
 # =========================
 else:
     st.markdown('<div class="section-header">ĐÁNH GIÁ HIỆU QUẢ ĐẦU TƯ</div>', unsafe_allow_html=True)
+    if "investment_calculated" not in st.session_state:
+        st.session_state.investment_calculated = False
+
     st.markdown('<div class="section-header">THÔNG TIN DỰ ÁN</div>', unsafe_allow_html=True)
     project_cols = st.columns([1.7, 1.3, 1.0])
     with project_cols[0]:
@@ -614,7 +636,10 @@ else:
 
         action_cols = st.columns(2)
         with action_cols[0]:
-            summary_df = pd.DataFrame({"Chỉ tiêu": ["NPV", "IRR", "Thời gian hoàn vốn", "WACC", "Tỷ lệ chiết khấu"], "Giá trị": [npv_value, irr_value if irr_value is not None else np.nan, payback if payback is not None else np.nan, wacc_value if wacc_value is not None else np.nan, discount]})
+            summary_df = pd.DataFrame({
+                "Chỉ tiêu": ["NPV", "IRR", "Thời gian hoàn vốn", "WACC", "Tỷ lệ chiết khấu"],
+                "Giá trị": [npv_value, irr_value if irr_value is not None else np.nan, payback if payback is not None else np.nan, wacc_value if wacc_value is not None else np.nan, discount],
+            })
             details_df = pd.DataFrame({"Kỳ": range(len(cashflows)), "Dòng tiền": cashflows, "Dòng tiền tích lũy": cumulative})
             export = dataframe_to_excel_bytes({"Ket_qua": summary_df, "Dong_tien": details_df})
             st.download_button("Tải báo cáo Excel", export, "danh_gia_hieu_qua_dau_tu.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True)
