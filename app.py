@@ -16,7 +16,7 @@ except Exception:
     types = None
 
 APP_TITLE = "TRỢ LÝ TÀI CHÍNH NHỎ"
-MODEL_NAME = "gemini-2.5-flash"
+MODEL_NAME = "gemini-3.7-flash"
 
 st.set_page_config(
     page_title=APP_TITLE,
@@ -36,50 +36,54 @@ st.markdown(
     --red2: #d32f2f;
     --green: #1b5e20;
     --blue: #1565c0;
-    --gold: #f9a825;
     --line: #d7dce1;
     --soft: #f7f8fa;
     --text: #202124;
 }
-.block-container { padding-top: 0.08rem; max-width: 1450px; }
+.block-container { padding-top: 0.12rem; max-width: 1450px; }
 .app-title {
-    color: var(--red); text-align: center; font-size: 2.05rem;
-    line-height: 1.15;
-    font-weight: 900; margin: 0 0 0.65rem 0; letter-spacing: .3px;
+    color: var(--red); text-align: center; font-size: 2.15rem;
+    line-height: 1.15; font-weight: 900; margin: 0 0 .7rem 0;
+    letter-spacing: .2px;
 }
-.app-note { text-align:center; color:#60656b; font-size:.92rem; margin-bottom:1rem; }
 .section-header {
-    font-size: 1.45rem; font-weight: 900; color: var(--red);
-    border-bottom: 2px solid var(--red); padding-bottom:.35rem; margin:.35rem 0 .8rem;
+    font-size: 1.42rem; font-weight: 900; color: var(--red);
+    border-bottom: 2px solid var(--red); padding-bottom: .32rem;
+    margin: .45rem 0 .8rem;
 }
-.input-title, .stTextInput label, .stNumberInput label, .stDateInput label,
-.stSelectbox label, .stFileUploader label, .stButton button, .stDownloadButton button {
+.stTextInput label, .stNumberInput label, .stDateInput label,
+.stSelectbox label, .stFileUploader label, .stTextArea label,
+.stRadio label, .stButton button, .stDownloadButton button {
     font-weight: 800 !important;
 }
+.sidebar-title { font-size: 1.5rem !important; font-weight: 900 !important; color: var(--red) !important; }
+.sidebar-help { font-size: .9rem; line-height: 1.55; color: #555; }
 .card {
     border: 1px solid var(--line); border-radius: 14px; padding: 1rem;
-    background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.07); height:100%;
+    background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    height: 100%; transition: transform .15s ease, box-shadow .15s ease;
 }
-.card:hover { transform: translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,.12); }
-.card-title { color:var(--red); font-size:1.28rem; font-weight:900; margin-bottom:.5rem; }
-.card-text { line-height:1.55; }
+.card:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,.12); }
+.card-title { color: var(--red); font-size: 1.32rem; font-weight: 900; margin-bottom: .5rem; }
+.card-text { line-height: 1.55; }
 .rule-box {
-    border:1px solid #e0bdbd; border-left:5px solid var(--red); border-radius:12px;
-    padding:1rem 1.1rem; background:#fff8f8; margin:.8rem 0 1rem;
+    border: 1px solid #e0bdbd; border-left: 5px solid var(--red);
+    border-radius: 12px; padding: 1rem 1.1rem; background: #fff8f8;
+    margin: .9rem 0 1rem;
 }
-.data-box { border:1px solid var(--line); border-radius:12px; padding:.7rem; background:var(--soft); }
-.metric-box { border:1px solid var(--line); border-radius:12px; padding:.75rem .9rem; background:#fff; min-height:90px; }
-.metric-label { color:#656b73; font-size:.88rem; font-weight:800; }
-.metric-value { color:#111827; font-size:1.25rem; font-weight:900; margin-top:.2rem; }
-.term-title { font-size:1.1rem; font-weight:900; color:var(--red); }
-.term-desc { font-size:.92rem; line-height:1.5; margin:.25rem 0 .65rem; }
-.small-note { color:#666; font-size:.83rem; }
-.ai-box { border:1px solid #c8d7eb; border-left:5px solid var(--blue); padding:.9rem 1rem; border-radius:10px; background:#f6f9ff; }
-.sidebar-title { font-size:1.45rem !important; font-weight:900 !important; color:var(--red) !important; }
-.sidebar-help { font-size:.88rem; line-height:1.55; color:#555; }
-div[data-testid="stVerticalBlock"] .stMetric { background:transparent; }
-/* Ẩn dấu +/- của number_input nếu còn component cũ dùng */
-button[data-testid="stNumberInputStepDown"], button[data-testid="stNumberInputStepUp"] { display:none !important; }
+.metric-box {
+    border: 1px solid var(--line); border-radius: 12px; padding: .75rem .9rem;
+    background: #fff; min-height: 92px; box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.metric-label { color: #656b73; font-size: .87rem; font-weight: 800; }
+.metric-value { color: #111827; font-size: 1.3rem; font-weight: 900; margin-top: .2rem; }
+.term-title { font-size: 1.05rem; font-weight: 900; color: var(--red); }
+.term-desc { font-size: .9rem; line-height: 1.48; margin: .25rem 0 .65rem; }
+.ai-box {
+    border: 1px solid #c8d7eb; border-left: 5px solid var(--blue);
+    padding: .9rem 1rem; border-radius: 10px; background: #f6f9ff;
+}
+.money-guide { color: #666; font-size: .84rem; }
 </style>
 """,
     unsafe_allow_html=True,
@@ -90,69 +94,65 @@ st.markdown(f'<div class="app-title">{APP_TITLE}</div>', unsafe_allow_html=True)
 # =========================
 # HÀM TIỆN ÍCH
 # =========================
-def money(v):
-    if v is None or pd.isna(v):
+def money(value):
+    if value is None or pd.isna(value):
         return "—"
-    return f"{float(v):,.0f}".replace(",", ".") + " đ"
+    return f"{float(value):,.0f}".replace(",", ".") + " đ"
 
 
-def compact_money(v):
-    if v is None or pd.isna(v):
+def percent(value):
+    if value is None or pd.isna(value):
         return "—"
-    return f"{float(v):,.0f}".replace(",", ".") + " đ"
-
-
-def percent(v):
-    if v is None or pd.isna(v):
-        return "—"
-    return f"{float(v) * 100:.2f}%"
+    return f"{float(value) * 100:.2f}%"
 
 
 def clean_money_text(value):
-    """Nhận số tiền nhập thủ công không dấu; cũng chấp nhận dữ liệu cũ có . , hoặc khoảng trắng."""
+    """Chuẩn hóa ô tiền: nhận số nguyên không dấu; bỏ mọi ký tự không phải số."""
     if value is None:
         return 0.0
-    s = str(value).strip()
-    if not s:
-        return 0.0
-    s = s.replace("đ", "").replace("Đ", "").replace(" ", "")
-    # Chỉ nhận số nguyên dương trong giao diện; loại bỏ mọi ký tự không phải số.
-    s = re.sub(r"[^0-9]", "", s)
-    return float(s) if s else 0.0
+    raw = str(value).strip().replace("đ", "").replace("Đ", "").replace(" ", "")
+    digits = re.sub(r"[^0-9]", "", raw)
+    return float(digits) if digits else 0.0
 
 
-def fmt_money_input(value):
-    value = int(round(float(value))) if value else 0
-    return f"{value:,}".replace(",", ".")
+def format_money_editor(value):
+    try:
+        number = int(round(float(value)))
+    except (TypeError, ValueError):
+        number = 0
+    return f"{number:,}".replace(",", ".")
 
 
-def _normalize_money_widget(key):
-    """Chuẩn hóa nội dung ô tiền sau mỗi lần người dùng kết thúc lượt nhập."""
-    raw = st.session_state.get(key, "")
-    digits = re.sub(r"\D", "", str(raw))
+def normalize_money_widget(key):
+    raw = st.session_state.get(key, "0")
+    digits = re.sub(r"[^0-9]", "", str(raw))
+    if not digits:
+        digits = "0"
     digits = digits.lstrip("0") or "0"
     st.session_state[key] = f"{int(digits):,}".replace(",", ".")
 
 
 def money_input(label, key, default=0):
-    """Ô nhập tiền an toàn:
-    - Mặc định hiển thị 0.
-    - Người dùng chỉ cần nhập chữ số, không cần tự gõ dấu phân cách.
-    - Khi kết thúc lượt nhập, hệ thống tự bỏ số 0 thừa ở đầu và định dạng
-      thành 1.000, 1.000.000, 1.000.000.000...
-    - Không có nút +/- và không dùng number_input format, tránh
-      StreamlitInvalidNumberFormatError.
+    """Nhập tiền bằng text để tránh StreamlitInvalidNumberFormatError.
+    Giá trị mặc định là 0; sau mỗi lần nhập, số được chuẩn hóa thành 1.000.000...
+    Người dùng chỉ cần gõ chữ số, không cần gõ dấu phân cách.
     """
     if key not in st.session_state:
-        st.session_state[key] = fmt_money_input(default)
-
-    st.text_input(
-        label,
-        key=key,
-        on_change=_normalize_money_widget,
-        args=(key,),
-    )
+        st.session_state[key] = format_money_editor(default)
+    st.text_input(label, key=key, on_change=normalize_money_widget, args=(key,))
     return clean_money_text(st.session_state.get(key, "0"))
+
+
+def date_input_vn(label, key, default=None):
+    """Ô ngày dùng định dạng dd/mm/yyyy, dùng chung cho toàn bộ ứng dụng."""
+    if default is None:
+        default = date.today()
+    return st.date_input(
+        label,
+        value=default,
+        format="DD/MM/YYYY",
+        key=key,
+    )
 
 
 def get_gemini_key():
@@ -177,79 +177,102 @@ def get_gemini_client():
 def call_gemini(instruction, data):
     client = get_gemini_client()
     if client is None:
-        return "Chưa cấu hình Gemini API. Bạn vẫn có thể sử dụng toàn bộ phần tính toán."
+        return "Chưa cấu hình Gemini API. Các chức năng tính toán vẫn sử dụng bình thường."
+
     system_instruction = """
-Bạn là trợ lý tài chính bình dân cho tiểu thương, hộ kinh doanh, nông hộ,
+Bạn là Trợ lý tài chính bình dân dành cho tiểu thương, hộ kinh doanh, nông hộ,
 cơ sở sản xuất nhỏ và hợp tác xã.
-Chỉ sử dụng số liệu được cung cấp; không tự tạo số liệu. Phân biệt rõ Kết quả tính toán,
-Nhận xét và Cảnh báo. Giải thích thuật ngữ bằng tiếng Việt dễ hiểu. Không khẳng định
-chắc chắn lợi nhuận tương lai và không thay thế kế toán, kiểm toán hoặc thẩm định chuyên môn.
+
+Chỉ sử dụng số liệu được cung cấp; không tự tạo hoặc sửa số liệu.
+Phân biệt rõ: Kết quả tính toán, Nhận xét, Cảnh báo.
+Giải thích thuật ngữ bằng tiếng Việt dễ hiểu.
+Không khẳng định chắc chắn lợi nhuận tương lai.
+Không thay thế kế toán, kiểm toán hoặc thẩm định chuyên môn.
 """
-    prompt = instruction + "\n\nDỮ LIỆU:\n" + json.dumps(data, ensure_ascii=False, indent=2, default=str)
+    prompt = instruction + "\n\nDỮ LIỆU ĐÃ TÍNH:\n" + json.dumps(
+        data, ensure_ascii=False, indent=2, default=str
+    )
     try:
         cfg = types.GenerateContentConfig(system_instruction=system_instruction) if types else None
-        res = client.models.generate_content(model=MODEL_NAME, contents=prompt, config=cfg)
-        return res.text or "AI không trả về nội dung."
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt,
+            config=cfg,
+        )
+        return response.text or "AI không trả về nội dung."
     except Exception as exc:
-        return f"Không thể gọi Gemini API: {exc}"
+        return f"Không thể gọi Gemini API lúc này: {exc}"
 
 
 def dataframe_to_excel_bytes(sheets):
-    out = io.BytesIO()
-    with pd.ExcelWriter(out, engine="openpyxl") as writer:
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
         for name, df in sheets.items():
             df.to_excel(writer, sheet_name=str(name)[:31], index=False)
-    return out.getvalue()
+    return output.getvalue()
 
 
 def npv(rate, cashflows):
+    if rate <= -1:
+        return float("nan")
     return float(sum(cf / ((1 + rate) ** t) for t, cf in enumerate(cashflows)))
 
 
 def irr_bisection(cashflows):
-    vals = np.asarray(cashflows, dtype=float)
-    if len(vals) < 2 or not (np.any(vals > 0) and np.any(vals < 0)):
+    values = np.asarray(cashflows, dtype=float)
+    if len(values) < 2 or not (np.any(values > 0) and np.any(values < 0)):
         return None
-    grid = np.concatenate([np.linspace(-0.99, -0.01, 100), np.linspace(0, 5, 300)])
-    prev_r = float(grid[0]); prev_v = npv(prev_r, cashflows)
-    for r in grid[1:]:
-        r = float(r); curr_v = npv(r, cashflows)
-        if np.isfinite(prev_v) and np.isfinite(curr_v) and prev_v * curr_v <= 0:
-            lo, hi = prev_r, r
-            flo = prev_v
+
+    grid = np.concatenate([
+        np.linspace(-0.99, -0.01, 100),
+        np.linspace(0, 5, 300),
+    ])
+    prev_r = float(grid[0])
+    prev_v = npv(prev_r, cashflows)
+
+    for current in grid[1:]:
+        current = float(current)
+        current_v = npv(current, cashflows)
+        if np.isfinite(prev_v) and np.isfinite(current_v) and prev_v * current_v <= 0:
+            low, high = prev_r, current
+            flow = prev_v
             for _ in range(120):
-                mid = (lo + hi) / 2
-                fm = npv(mid, cashflows)
-                if abs(fm) < 1e-9:
+                mid = (low + high) / 2
+                fmid = npv(mid, cashflows)
+                if abs(fmid) < 1e-9:
                     return float(mid)
-                if flo * fm <= 0:
-                    hi = mid
+                if flow * fmid <= 0:
+                    high = mid
                 else:
-                    lo, flo = mid, fm
-            return float((lo + hi) / 2)
-        prev_r, prev_v = r, curr_v
+                    low, flow = mid, fmid
+            return float((low + high) / 2)
+        prev_r, prev_v = current, current_v
     return None
 
 
 def payback_period(cashflows):
-    cum = float(cashflows[0])
-    if cum >= 0:
+    cumulative = float(cashflows[0])
+    if cumulative >= 0:
         return 0.0
     for i in range(1, len(cashflows)):
-        prev = cum
-        cum += cashflows[i]
-        if cum >= 0:
+        previous = cumulative
+        cumulative += cashflows[i]
+        if cumulative >= 0:
             step = cashflows[i]
-            return float(i) if step == 0 else (i - 1) + min(max((-prev) / step, 0), 1)
+            if step == 0:
+                return float(i)
+            fraction = min(max((-previous) / step, 0), 1)
+            return float(i - 1 + fraction)
     return None
 
 
-def compute_wacc(e, d, ke, kd, tax):
-    total = e + d
+def compute_wacc(equity, debt, cost_equity, cost_debt, tax):
+    total = equity + debt
     if total <= 0:
         return None
-    e, d = e / total, d / total
-    return e * ke + d * kd * (1 - tax)
+    e = equity / total
+    d = debt / total
+    return e * cost_equity + d * cost_debt * (1 - tax)
 
 
 def navigate(page_name):
@@ -262,26 +285,28 @@ def navigate(page_name):
 if "page" not in st.session_state:
     st.session_state.page = "🏠 Tổng quan"
 
+pages = {
+    "🏠 Tổng quan": "TỔNG QUAN",
+    "💰 Sổ tay Dòng tiền": "SỔ TAY DÒNG TIỀN",
+    "⚙️ Tính Khấu hao": "TÍNH KHẤU HAO",
+    "📈 Đánh giá Hiệu quả Đầu tư": "ĐÁNH GIÁ HIỆU QUẢ ĐẦU TƯ",
+}
+
 with st.sidebar:
     st.markdown('<div class="sidebar-title">DANH MỤC</div>', unsafe_allow_html=True)
     st.markdown(
         '<div class="sidebar-help"><b>Hướng dẫn nhanh:</b><br>'
-        'Chọn một mục → nhập dữ liệu → xem kết quả.<br><br>'
+        'Chọn một mục → nhập dữ liệu → xem kết quả.<br>'
         'Nút AI chỉ dùng khi cần giải thích hoặc nhận xét.</div>',
         unsafe_allow_html=True,
     )
     st.divider()
-    pages = {
-        "🏠 Tổng quan": "TỔNG QUAN",
-        "💰 Sổ tay Dòng tiền": "SỔ TAY DÒNG TIỀN",
-        "⚙️ Tính Khấu hao": "TÍNH KHẤU HAO",
-        "📈 Đánh giá Hiệu quả Đầu tư": "ĐÁNH GIÁ HIỆU QUẢ ĐẦU TƯ",
-    }
     selected = st.radio(
-        "Chọn mục trong danh mục",
+        "Chọn chức năng trong danh mục",
         list(pages.keys()),
         index=list(pages.keys()).index(st.session_state.page),
         label_visibility="collapsed",
+        key="navigation_radio",
     )
     st.session_state.page = selected
 
@@ -292,17 +317,29 @@ if st.session_state.page == "🏠 Tổng quan":
     st.markdown('<div class="section-header">TỔNG QUAN CHƯƠNG TRÌNH</div>', unsafe_allow_html=True)
     cards = st.columns(3)
     card_data = [
-        ("💰 SỔ TAY DÒNG TIỀN", "Ghi lại từng khoản thu và chi, theo dõi tổng tiền vào, tổng tiền ra và dòng tiền ròng", "💰 Sổ tay Dòng tiền"),
-        ("⚙️ TÍNH KHẤU HAO", "Tính khấu hao đường thẳng cho máy móc, thiết bị và tài sản.", "⚙️ Tính Khấu hao"),
-        ("📈 ĐÁNH GIÁ ĐẦU TƯ", "Tính NPV- Giá trị hiện tại ròng, IRR - Tỷ suất hoàn vốn nội bộ, thời gian hoàn vốn và WACC- Chi phí sử dụng vốn bình quân gia quyền khi đủ dữ liệu", "📈 Đánh giá Hiệu quả Đầu tư"),
+        (
+            "💰 SỔ TAY DÒNG TIỀN",
+            "Ghi lại từng khoản thu và chi, theo dõi tổng tiền vào, tổng tiền ra và dòng tiền ròng",
+            "💰 Sổ tay Dòng tiền",
+        ),
+        (
+            "⚙️ TÍNH KHẤU HAO",
+            "Tính khấu hao đường thẳng cho máy móc, thiết bị và tài sản.",
+            "⚙️ Tính Khấu hao",
+        ),
+        (
+            "📈 ĐÁNH GIÁ ĐẦU TƯ",
+            "Tính NPV- Giá trị hiện tại ròng, IRR - Tỷ suất hoàn vốn nội bộ, thời gian hoàn vốn và WACC- Chi phí sử dụng vốn bình quân gia quyền khi đủ dữ liệu",
+            "📈 Đánh giá Hiệu quả Đầu tư",
+        ),
     ]
     for col, (title, desc, target) in zip(cards, card_data):
         with col:
             st.markdown('<div class="card">', unsafe_allow_html=True)
             if st.button(title, key=f"card_{target}", use_container_width=True):
                 navigate(target)
-            st.markdown(f'<div class="card-title">{title}</div><div class="card-text">{desc}</div>', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="card-title">{title}</div><div class="card-text">{desc}</div></div>', unsafe_allow_html=True)
+
     st.markdown(
         '<div class="rule-box"><b>Nguyên tắc sử dụng:</b> dữ liệu nhập vào là cơ sở của mọi kết quả. '
         'Cần kiểm tra số liệu trước khi sử dụng để báo cáo hoặc ra quyết định.<br><br>'
@@ -312,10 +349,10 @@ if st.session_state.page == "🏠 Tổng quan":
     if ai_available():
         st.success("Gemini AI đã sẵn sàng.")
     else:
-        st.info("Gemini AI chưa được cấu hình; các chức năng tính toán vẫn sử dụng bình thường.")
+        st.info("Gemini AI chưa được cấu hình; các chức năng tính toán vẫn hoạt động bình thường.")
 
 # =========================
-# DÒNG TIỀN
+# SỔ TAY DÒNG TIỀN
 # =========================
 elif st.session_state.page == "💰 Sổ tay Dòng tiền":
     st.markdown('<div class="section-header">SỔ TAY DÒNG TIỀN</div>', unsafe_allow_html=True)
@@ -323,13 +360,17 @@ elif st.session_state.page == "💰 Sổ tay Dòng tiền":
         st.session_state.cashflows = pd.DataFrame(columns=["Ngày", "Loại", "Nhóm", "Nội dung", "Số tiền"])
 
     st.markdown('<div class="section-header">NHẬP DỮ LIỆU</div>', unsafe_allow_html=True)
-    cols = st.columns([1.15, 1.0, 1.25, 1.7, 1.25, .75])
+    cols = st.columns([1.15, 1.0, 1.35, 1.75, 1.3, .8])
     with cols[0]:
         d = date_input_vn("Ngày", "cash_date")
     with cols[1]:
         typ = st.selectbox("Loại giao dịch", ["Thu", "Chi"], key="cash_type")
     with cols[2]:
-        group = st.selectbox("Nhóm", ["Bán hàng", "Nguyên liệu", "Lương", "Điện/nước", "Vận chuyển", "Thuê mặt bằng", "Mua tài sản", "Khác"], key="cash_group")
+        group = st.selectbox(
+            "Nhóm",
+            ["Bán hàng", "Nguyên liệu", "Lương", "Điện/nước", "Vận chuyển", "Thuê mặt bằng", "Mua tài sản", "Khác"],
+            key="cash_group",
+        )
     with cols[3]:
         content = st.text_input("Nội dung", key="cash_content")
     with cols[4]:
@@ -343,22 +384,23 @@ elif st.session_state.page == "💰 Sổ tay Dòng tiền":
             st.session_state.cash_content = ""
             st.success("Đã thêm giao dịch.")
 
-    up_cols = st.columns([1, 1])
-    with up_cols[0]:
+    upload_cols = st.columns([1, 2])
+    with upload_cols[0]:
         uploaded = st.file_uploader("Tải dữ liệu Excel/CSV", type=["xlsx", "csv"], key="cash_upload")
-    with up_cols[1]:
+    with upload_cols[1]:
         st.caption("File nên có các cột: Ngày, Loại, Nhóm, Nội dung, Số tiền.")
+
     if uploaded is not None:
         try:
-            df_up = pd.read_csv(uploaded) if uploaded.name.lower().endswith(".csv") else pd.read_excel(uploaded)
+            imported = pd.read_csv(uploaded) if uploaded.name.lower().endswith(".csv") else pd.read_excel(uploaded)
             required = {"Ngày", "Loại", "Số tiền"}
-            if not required.issubset(df_up.columns):
-                st.error("File thiếu một hoặc nhiều cột bắt buộc: Ngày, Loại, Số tiền.")
+            if not required.issubset(imported.columns):
+                st.error("File thiếu cột bắt buộc: Ngày, Loại, Số tiền.")
             else:
-                for c in ["Nhóm", "Nội dung"]:
-                    if c not in df_up.columns:
-                        df_up[c] = ""
-                st.session_state.cashflows = df_up[["Ngày", "Loại", "Nhóm", "Nội dung", "Số tiền"]].copy()
+                for col in ["Nhóm", "Nội dung"]:
+                    if col not in imported.columns:
+                        imported[col] = ""
+                st.session_state.cashflows = imported[["Ngày", "Loại", "Nhóm", "Nội dung", "Số tiền"]].copy()
                 st.success("Đã tải dữ liệu thành công.")
         except Exception as exc:
             st.error(f"Không thể đọc file: {exc}")
@@ -370,13 +412,15 @@ elif st.session_state.page == "💰 Sổ tay Dòng tiền":
         df = df.dropna(subset=["Ngày"])
 
     st.markdown('<div class="section-header">KẾT QUẢ</div>', unsafe_allow_html=True)
-    total_in = float(df.loc[df["Loại"].eq("Thu"), "Số tiền"].sum()) if not df.empty else 0
-    total_out = float(df.loc[df["Loại"].eq("Chi"), "Số tiền"].sum()) if not df.empty else 0
+    total_in = float(df.loc[df["Loại"].eq("Thu"), "Số tiền"].sum()) if not df.empty else 0.0
+    total_out = float(df.loc[df["Loại"].eq("Chi"), "Số tiền"].sum()) if not df.empty else 0.0
     net = total_in - total_out
-    mcols = st.columns(3)
-    for c, lab, val in zip(mcols, ["TỔNG TIỀN VÀO", "TỔNG TIỀN RA", "DÒNG TIỀN RÒNG"], [total_in, total_out, net]):
-        with c:
-            st.markdown(f'<div class="metric-box"><div class="metric-label">{lab}</div><div class="metric-value">{money(val)}</div></div>', unsafe_allow_html=True)
+
+    metrics = st.columns(3)
+    for col, label, value in zip(metrics, ["TỔNG TIỀN VÀO", "TỔNG TIỀN RA", "DÒNG TIỀN RÒNG"], [total_in, total_out, net]):
+        with col:
+            st.markdown(f'<div class="metric-box"><div class="metric-label">{label}</div><div class="metric-value">{money(value)}</div></div>', unsafe_allow_html=True)
+
     if net > 0:
         st.success("Dòng tiền đang dương. Tiền thu vào lớn hơn tiền chi ra, kết quả kinh doanh có dấu hiệu sinh lời")
     elif net < 0:
@@ -391,25 +435,40 @@ elif st.session_state.page == "💰 Sổ tay Dòng tiền":
         fig.update_yaxes(tickformat=",.0f")
         st.plotly_chart(fig, use_container_width=True)
 
-        net_month = df.assign(Tháng=df["Ngày"].dt.to_period("M").astype(str), signed=np.where(df["Loại"].eq("Thu"), df["Số tiền"], -df["Số tiền"])).groupby("Tháng", as_index=False)["signed"].sum().rename(columns={"signed":"Dòng tiền ròng"})
-        fig2 = px.line(net_month, x="Tháng", y="Dòng tiền ròng", markers=True, title="Dòng tiền ròng theo tháng", text="Dòng tiền ròng")
+        net_month = df.assign(
+            Tháng=df["Ngày"].dt.to_period("M").astype(str),
+            signed=np.where(df["Loại"].eq("Thu"), df["Số tiền"], -df["Số tiền"]),
+        ).groupby("Tháng", as_index=False)["signed"].sum().rename(columns={"signed": "Dòng tiền ròng"})
+        fig2 = px.line(net_month, x="Tháng", y="Dòng tiền ròng", markers=True, text="Dòng tiền ròng", title="Dòng tiền ròng theo tháng")
         fig2.update_traces(texttemplate="%{text:,.0f}", textposition="top center", hovertemplate="%{y:,.0f} đ<extra></extra>")
         fig2.update_yaxes(tickformat=",.0f")
         st.plotly_chart(fig2, use_container_width=True)
 
-        with st.expander("Xem bảng giao dịch"):
-            show = df.copy()
-            show["Ngày"] = show["Ngày"].dt.strftime("%d/%m/%Y")
-            show["Số tiền"] = show["Số tiền"].map(money)
-            st.dataframe(show, use_container_width=True, hide_index=True)
+        st.dataframe(
+            df.assign(**{"Ngày": df["Ngày"].dt.strftime("%d/%m/%Y"), "Số tiền": df["Số tiền"].map(money)}),
+            use_container_width=True,
+            hide_index=True,
+        )
 
-        a, b = st.columns(2)
-        with a:
+        action_cols = st.columns(3)
+        with action_cols[0]:
             export = dataframe_to_excel_bytes({"So_tay_dong_tien": df})
             st.download_button("Tải Excel", export, "so_tay_dong_tien.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True)
-        with b:
+        with action_cols[1]:
             if st.button("Phân tích bằng AI", key="cash_ai", use_container_width=True):
-                st.markdown('<div class="ai-box">'+call_gemini("Phân tích tình hình dòng tiền, nêu điểm đáng chú ý và cảnh báo nếu có.", {"tong_tien_vao":total_in,"tong_tien_ra":total_out,"dong_tien_rong":net,"so_giao_dich":len(df)})+'</div>', unsafe_allow_html=True)
+                payload = {
+                    "tong_tien_vao": total_in,
+                    "tong_tien_ra": total_out,
+                    "dong_tien_rong": net,
+                    "so_giao_dich": len(df),
+                }
+                st.markdown(f'<div class="ai-box">{call_gemini("Phân tích tình hình dòng tiền, nêu các điểm đáng chú ý và cảnh báo nếu có.", payload)}</div>', unsafe_allow_html=True)
+        with action_cols[2]:
+            if st.button("Xóa toàn bộ dữ liệu", key="cash_clear", use_container_width=True):
+                st.session_state.cashflows = pd.DataFrame(columns=["Ngày", "Loại", "Nhóm", "Nội dung", "Số tiền"])
+                st.rerun()
+    else:
+        st.info("Chưa có dữ liệu. Hãy nhập giao dịch hoặc tải file.")
 
 # =========================
 # KHẤU HAO
@@ -417,143 +476,227 @@ elif st.session_state.page == "💰 Sổ tay Dòng tiền":
 elif st.session_state.page == "⚙️ Tính Khấu hao":
     st.markdown('<div class="section-header">TÍNH KHẤU HAO</div>', unsafe_allow_html=True)
     st.markdown('<div class="section-header">NHẬP THÔNG TIN TÀI SẢN</div>', unsafe_allow_html=True)
+
     if "assets" not in st.session_state:
         st.session_state.assets = []
-    if "dep_row" not in st.session_state:
-        st.session_state.dep_row = 0
 
-    cols = st.columns([1.35, 1.2, 1.2, 1.25, 1.25, 1.1, .7])
-    with cols[0]: name = st.text_input("Tên tài sản", key="dep_name")
-    with cols[1]: cost = money_input("Nguyên giá", "dep_cost", 0)
-    with cols[2]: salvage = money_input("Giá trị thu hồi", "dep_salvage", 0)
-    with cols[3]: years = st.number_input("Thời gian sử dụng (năm)", min_value=1, max_value=100, value=5, step=1, key="dep_years")
-    with cols[4]: purchase = date_input_vn("Ngày mua", "dep_purchase")
+    cols = st.columns([1.35, 1.2, 1.2, 1.25, 1.25, .7, .7])
+    with cols[0]:
+        name = st.text_input("Tên tài sản", key="dep_name")
+    with cols[1]:
+        cost = money_input("Nguyên giá", "dep_cost", 0)
+    with cols[2]:
+        salvage = money_input("Giá trị thu hồi", "dep_salvage", 0)
+    with cols[3]:
+        years = st.number_input("Thời gian sử dụng (năm)", min_value=1, max_value=100, value=5, step=1, key="dep_years")
+    with cols[4]:
+        purchase = date_input_vn("Ngày mua", "dep_purchase")
     with cols[5]:
         st.markdown("<br>", unsafe_allow_html=True)
         add_asset = st.button("Thêm", key="dep_add", use_container_width=True)
     with cols[6]:
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("Xóa", key="dep_clear", use_container_width=True):
-            st.session_state.assets = []
-            st.rerun()
+        clear_assets = st.button("Xóa", key="dep_clear", use_container_width=True)
+
+    if clear_assets:
+        st.session_state.assets = []
+        st.rerun()
 
     if add_asset:
-        if cost <= 0 or salvage > cost:
-            st.error("Kiểm tra nguyên giá và giá trị thu hồi.")
+        if cost <= 0:
+            st.error("Nguyên giá phải lớn hơn 0.")
+        elif salvage < 0 or salvage > cost:
+            st.error("Giá trị thu hồi phải từ 0 đến không vượt quá nguyên giá.")
         else:
-            st.session_state.assets.append({"Tên tài sản": name or f"Tài sản {len(st.session_state.assets)+1}", "Nguyên giá": cost, "Giá trị thu hồi": salvage, "Thời gian sử dụng (năm)": years, "Ngày mua": purchase.strftime("%d/%m/%Y")})
+            st.session_state.assets.append({
+                "Tên tài sản": name or f"Tài sản {len(st.session_state.assets) + 1}",
+                "Nguyên giá": cost,
+                "Giá trị thu hồi": salvage,
+                "Thời gian sử dụng (năm)": int(years),
+                "Ngày mua": purchase.strftime("%d/%m/%Y"),
+            })
             st.session_state.dep_name = ""
             st.session_state.dep_cost = "0"
             st.session_state.dep_salvage = "0"
             st.success("Đã thêm tài sản.")
 
     if st.session_state.assets:
-        rows = []
         today = date.today()
-        for a in st.session_state.assets:
-            pdate = datetime.strptime(a["Ngày mua"], "%d/%m/%Y").date()
-            months_used = max(0, (today.year - pdate.year) * 12 + today.month - pdate.month - (today.day < pdate.day))
-            total_months = int(a["Thời gian sử dụng (năm)"] * 12)
+        rows = []
+        for asset in st.session_state.assets:
+            purchase_date = datetime.strptime(asset["Ngày mua"], "%d/%m/%Y").date()
+            months_used = max(
+                0,
+                (today.year - purchase_date.year) * 12
+                + today.month
+                - purchase_date.month
+                - int(today.day < purchase_date.day),
+            )
+            total_months = int(asset["Thời gian sử dụng (năm)"] * 12)
             used_months = min(months_used, total_months)
-            annual_dep = (a["Nguyên giá"] - a["Giá trị thu hồi"]) / a["Thời gian sử dụng (năm)"]
+            annual_dep = (asset["Nguyên giá"] - asset["Giá trị thu hồi"]) / asset["Thời gian sử dụng (năm)"]
             monthly_dep = annual_dep / 12
-            incurred = min(used_months * monthly_dep, a["Nguyên giá"] - a["Giá trị thu hồi"])
-            remaining_dep = max(0, (a["Nguyên giá"] - a["Giá trị thu hồi"]) - incurred)
+            incurred = min(used_months * monthly_dep, asset["Nguyên giá"] - asset["Giá trị thu hồi"])
+            remaining_dep = max(0, (asset["Nguyên giá"] - asset["Giá trị thu hồi"]) - incurred)
             remaining_months = max(0, total_months - used_months)
-            book_value = max(a["Giá trị thu hồi"], a["Nguyên giá"] - incurred)
-            rows.append({**a, "Đã sử dụng": f"{used_months/12:.1f} năm", "Thời gian còn lại": f"{remaining_months/12:.1f} năm", "Khấu hao năm": annual_dep, "Khấu hao tháng": monthly_dep, "Khấu hao đã phát sinh": incurred, "Khấu hao còn lại": remaining_dep, "Giá trị còn lại": book_value})
+            book_value = max(asset["Giá trị thu hồi"], asset["Nguyên giá"] - incurred)
+            rows.append({
+                **asset,
+                "Đã sử dụng": f"{used_months / 12:.1f} năm",
+                "Thời gian còn lại": f"{remaining_months / 12:.1f} năm",
+                "Khấu hao năm": annual_dep,
+                "Khấu hao tháng": monthly_dep,
+                "Khấu hao đã phát sinh": incurred,
+                "Khấu hao còn lại": remaining_dep,
+                "Giá trị còn lại": book_value,
+            })
+
         dep_df = pd.DataFrame(rows)
         st.markdown('<div class="section-header">KẾT QUẢ KHẤU HAO</div>', unsafe_allow_html=True)
-        disp = dep_df.copy()
-        for c in ["Nguyên giá", "Giá trị thu hồi", "Khấu hao năm", "Khấu hao tháng", "Khấu hao đã phát sinh", "Khấu hao còn lại", "Giá trị còn lại"]:
-            disp[c] = disp[c].map(money)
-        st.dataframe(disp, use_container_width=True, hide_index=True)
-        st.caption(f"Ngày tính: {date.today().strftime('%d/%m/%Y')}")
+        display_df = dep_df.copy()
+        for column in ["Nguyên giá", "Giá trị thu hồi", "Khấu hao năm", "Khấu hao tháng", "Khấu hao đã phát sinh", "Khấu hao còn lại", "Giá trị còn lại"]:
+            display_df[column] = display_df[column].map(money)
+        st.dataframe(display_df, use_container_width=True, hide_index=True)
+        st.caption(f"Ngày tính: {today.strftime('%d/%m/%Y')}")
 
         metric_cols = st.columns(3)
-        total_incurred = float(dep_df["Khấu hao đã phát sinh"].sum())
-        total_remaining = float(dep_df["Khấu hao còn lại"].sum())
-        total_book = float(dep_df["Giá trị còn lại"].sum())
-        for c, lab, val in zip(metric_cols, ["KHẤU HAO ĐÃ PHÁT SINH", "KHẤU HAO CÒN LẠI", "GIÁ TRỊ CÒN LẠI"], [total_incurred, total_remaining, total_book]):
-            with c:
-                st.markdown(f'<div class="metric-box"><div class="metric-label">{lab}</div><div class="metric-value">{money(val)}</div></div>', unsafe_allow_html=True)
+        values = [
+            float(dep_df["Khấu hao đã phát sinh"].sum()),
+            float(dep_df["Khấu hao còn lại"].sum()),
+            float(dep_df["Giá trị còn lại"].sum()),
+        ]
+        labels = ["KHẤU HAO ĐÃ PHÁT SINH", "KHẤU HAO CÒN LẠI", "GIÁ TRỊ CÒN LẠI"]
+        for col, label, value in zip(metric_cols, labels, values):
+            with col:
+                st.markdown(f'<div class="metric-box"><div class="metric-label">{label}</div><div class="metric-value">{money(value)}</div></div>', unsafe_allow_html=True)
 
-        a, b = st.columns(2)
-        with a:
+        actions = st.columns(2)
+        with actions[0]:
             export = dataframe_to_excel_bytes({"Khau_hao": dep_df})
             st.download_button("Tải Excel", export, "tinh_khau_hao.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True)
-        with b:
+        with actions[1]:
             if st.button("Phân tích bằng AI", key="dep_ai", use_container_width=True):
-                st.markdown('<div class="ai-box">'+call_gemini("Giải thích ngắn gọn khấu hao và ảnh hưởng của phần khấu hao đến chi phí kinh doanh.", {"tai_san":rows})+'</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="ai-box">{call_gemini("Giải thích ngắn gọn khấu hao và ảnh hưởng của khấu hao đến chi phí kinh doanh.", {"tai_san": rows})}</div>', unsafe_allow_html=True)
     else:
         st.info("Chưa có tài sản. Nhập thông tin và bấm Thêm.")
 
 # =========================
-# ĐẦU TƯ
+# ĐÁNH GIÁ HIỆU QUẢ ĐẦU TƯ
 # =========================
 elif st.session_state.page == "📈 Đánh giá Hiệu quả Đầu tư":
     st.markdown('<div class="section-header">ĐÁNH GIÁ HIỆU QUẢ ĐẦU TƯ</div>', unsafe_allow_html=True)
     st.markdown('<div class="section-header">THÔNG TIN DỰ ÁN</div>', unsafe_allow_html=True)
-    pcols = st.columns([1.8, 1.25, 1.25])
-    with pcols[0]: project = st.text_input("Tên dự án", key="project")
-    with pcols[1]: initial = money_input("Vốn đầu tư ban đầu", "initial", 0)
-    with pcols[2]: periods = st.number_input("Số kỳ dự kiến", min_value=1, max_value=50, value=5, step=1, key="periods")
+
+    project_cols = st.columns([1.7, 1.3, 1.0])
+    with project_cols[0]:
+        project = st.text_input("Tên dự án", key="project")
+    with project_cols[1]:
+        initial = money_input("Vốn đầu tư ban đầu", "initial", 0)
+    with project_cols[2]:
+        periods = st.number_input("Số kỳ dự kiến", min_value=1, max_value=50, value=5, step=1, key="periods")
 
     st.markdown('<div class="section-header">DÒNG TIỀN TỪNG KỲ</div>', unsafe_allow_html=True)
     cf_cols = st.columns(int(periods) + 1)
     for i in range(1, int(periods) + 1):
-        with cf_cols[i-1]:
+        with cf_cols[i - 1]:
             money_input(f"Kỳ {i}", f"cf_{i}", 0)
     with cf_cols[-1]:
         discount = st.number_input("Tỷ lệ chiết khấu (%)", min_value=-99.0, max_value=500.0, value=10.0, step=0.5, key="discount") / 100.0
 
     st.markdown('<div class="section-header">DỮ LIỆU WACC — NẾU CÓ</div>', unsafe_allow_html=True)
-    wcols = st.columns(5)
-    with wcols[0]: e = st.number_input("Vốn chủ sở hữu (%)", 0.0, 100.0, 100.0, 1.0) / 100.0
-    with wcols[1]: d = st.number_input("Vốn vay (%)", 0.0, 100.0, 0.0, 1.0) / 100.0
-    with wcols[2]: ke = st.number_input("Chi phí vốn chủ (%)", 0.0, 100.0, 10.0, 0.5) / 100.0
-    with wcols[3]: kd = st.number_input("Chi phí vốn vay (%)", 0.0, 100.0, 8.0, 0.5) / 100.0
-    with wcols[4]: tax = st.number_input("Thuế suất (%)", 0.0, 100.0, 20.0, 0.5) / 100.0
+    wacc_cols = st.columns(5)
+    with wacc_cols[0]:
+        equity = st.number_input("Vốn chủ sở hữu (%)", min_value=0.0, max_value=100.0, value=100.0, step=1.0, key="equity") / 100.0
+    with wacc_cols[1]:
+        debt = st.number_input("Vốn vay (%)", min_value=0.0, max_value=100.0, value=0.0, step=1.0, key="debt") / 100.0
+    with wacc_cols[2]:
+        cost_equity = st.number_input("Chi phí vốn chủ (%)", min_value=0.0, max_value=100.0, value=10.0, step=0.5, key="cost_equity") / 100.0
+    with wacc_cols[3]:
+        cost_debt = st.number_input("Chi phí vốn vay (%)", min_value=0.0, max_value=100.0, value=8.0, step=0.5, key="cost_debt") / 100.0
+    with wacc_cols[4]:
+        tax = st.number_input("Thuế suất (%)", min_value=0.0, max_value=100.0, value=20.0, step=0.5, key="tax") / 100.0
 
-    cashflows = [-initial] + [clean_money_text(st.session_state.get(f"cf_{i}", "0")) for i in range(1, int(periods)+1)]
-    npv_val = npv(discount, cashflows)
-    irr_val = irr_bisection(cashflows)
-    pb = payback_period(cashflows)
-    wacc = compute_wacc(e, d, ke, kd, tax)
+    cashflows = [-initial] + [clean_money_text(st.session_state.get(f"cf_{i}", "0")) for i in range(1, int(periods) + 1)]
+    npv_value = npv(discount, cashflows)
+    irr_value = irr_bisection(cashflows)
+    payback = payback_period(cashflows)
+    wacc_value = compute_wacc(equity, debt, cost_equity, cost_debt, tax)
 
     st.markdown('<div class="section-header">KẾT QUẢ VÀ Ý NGHĨA</div>', unsafe_allow_html=True)
     concepts = [
-        ("NPV — GIÁ TRỊ HIỆN TẠI RÒNG", "Là tổng chênh lệch giữa dòng tiền thu vào và dòng tiền chi ra, được quy đổi tất cả về giá trị tại thời điểm hiện tại theo một tỷ suất chiết khấu nhất định.", money(npv_val)),
-        ("IRR — TỶ SUẤT HOÀN VỐN NỘI BỘ", "Là mức tỷ suất làm cho NPV của dự án bằng 0. Có thể hiểu đơn giản là mức sinh lời nội tại của chuỗi dòng tiền.", percent(irr_val)),
-        ("PAYBACK — THỜI GIAN HOÀN VỐN", "Là khoảng thời gian dự kiến để dòng tiền tích lũy thu hồi đủ số vốn đầu tư ban đầu.", f"{pb:.1f} năm" if pb is not None else "Chưa hoàn vốn"),
-        ("WACC — CHI PHÍ SỬ DỤNG VỐN BÌNH QUÂN GIA QUYỀN", "Là chi phí bình quân của các nguồn vốn tài trợ cho dự án, có xét tỷ trọng vốn chủ sở hữu và vốn vay.", percent(wacc)),
+        (
+            "NPV — GIÁ TRỊ HIỆN TẠI RÒNG",
+            "Là tổng chênh lệch giữa dòng tiền thu vào và dòng tiền chi ra, được quy đổi tất cả về giá trị tại thời điểm hiện tại theo một tỷ suất chiết khấu nhất định.",
+            money(npv_value),
+        ),
+        (
+            "IRR — TỶ SUẤT HOÀN VỐN NỘI BỘ",
+            "Là mức tỷ suất làm cho NPV của dự án bằng 0; có thể hiểu đơn giản là mức sinh lời nội tại của chuỗi dòng tiền.",
+            percent(irr_value),
+        ),
+        (
+            "PAYBACK — THỜI GIAN HOÀN VỐN",
+            "Là khoảng thời gian dự kiến để dòng tiền tích lũy thu hồi đủ số vốn đầu tư ban đầu.",
+            f"{payback:.1f} năm" if payback is not None else "Chưa hoàn vốn",
+        ),
+        (
+            "WACC — CHI PHÍ SỬ DỤNG VỐN BÌNH QUÂN GIA QUYỀN",
+            "Là chi phí bình quân của các nguồn vốn tài trợ cho dự án, có xét tỷ trọng vốn chủ sở hữu và vốn vay.",
+            percent(wacc_value),
+        ),
     ]
-    c = st.columns(4)
-    for col, (title, desc, val) in zip(c, concepts):
+    concept_cols = st.columns(4)
+    for col, (title, description, value) in zip(concept_cols, concepts):
         with col:
-            st.markdown(f'<div class="metric-box"><div class="term-title">{title}</div><div class="term-desc">{desc}</div><div class="metric-value">{val}</div></div>', unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="metric-box"><div class="term-title">{title}</div>'
+                f'<div class="term-desc">{description}</div>'
+                f'<div class="metric-value">{value}</div></div>',
+                unsafe_allow_html=True,
+            )
 
-    if npv_val > 0:
+    if npv_value > 0:
         st.success("NPV dương: dự án đang có tín hiệu tạo thêm giá trị theo tỷ suất chiết khấu đã nhập.")
-    elif npv_val < 0:
+    elif npv_value < 0:
         st.warning("NPV âm: dự án chưa đạt mức sinh lời yêu cầu theo tỷ suất chiết khấu đã nhập.")
     else:
         st.info("NPV bằng 0: dự án vừa đạt mức sinh lời yêu cầu theo giả định hiện tại.")
 
-    cum = np.cumsum(cashflows)
-    chart_df = pd.DataFrame({"Kỳ": range(len(cum)), "Dòng tiền tích lũy": cum})
+    if irr_value is not None:
+        if irr_value > discount:
+            st.success(f"IRR ({percent(irr_value)}) cao hơn tỷ lệ chiết khấu ({percent(discount)}): tín hiệu tích cực.")
+        else:
+            st.warning(f"IRR ({percent(irr_value)}) không cao hơn tỷ lệ chiết khấu ({percent(discount)}).")
+
+    cumulative = np.cumsum(cashflows)
+    chart_df = pd.DataFrame({"Kỳ": range(len(cumulative)), "Dòng tiền tích lũy": cumulative})
     fig = px.line(chart_df, x="Kỳ", y="Dòng tiền tích lũy", markers=True, text="Dòng tiền tích lũy", title="Dòng tiền tích lũy")
     fig.update_traces(texttemplate="%{text:,.0f}", textposition="top center", hovertemplate="%{y:,.0f} đ<extra></extra>")
     fig.update_yaxes(tickformat=",.0f")
     st.plotly_chart(fig, use_container_width=True)
 
-    a, b = st.columns(2)
-    with a:
-        summary = pd.DataFrame({"Chỉ tiêu":["NPV","IRR","Thời gian hoàn vốn","WACC","Tỷ lệ chiết khấu"], "Giá trị":[npv_val, irr_val if irr_val is not None else np.nan, pb if pb is not None else np.nan, wacc if wacc is not None else np.nan, discount]})
-        details = pd.DataFrame({"Kỳ":range(len(cashflows)), "Dòng tiền":cashflows, "Dòng tiền tích lũy":cum})
-        export = dataframe_to_excel_bytes({"Ket_qua":summary, "Dong_tien":details})
+    action_cols = st.columns(2)
+    with action_cols[0]:
+        summary_df = pd.DataFrame({
+            "Chỉ tiêu": ["NPV", "IRR", "Thời gian hoàn vốn", "WACC", "Tỷ lệ chiết khấu"],
+            "Giá trị": [npv_value, irr_value if irr_value is not None else np.nan, payback if payback is not None else np.nan, wacc_value if wacc_value is not None else np.nan, discount],
+        })
+        details_df = pd.DataFrame({"Kỳ": range(len(cashflows)), "Dòng tiền": cashflows, "Dòng tiền tích lũy": cumulative})
+        export = dataframe_to_excel_bytes({"Ket_qua": summary_df, "Dong_tien": details_df})
         st.download_button("Tải báo cáo Excel", export, "danh_gia_hieu_qua_dau_tu.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True)
-    with b:
+    with action_cols[1]:
         if st.button("Phân tích bằng AI", key="investment_ai", use_container_width=True):
-            payload = {"du_an":project, "von_dau_tu_ban_dau":initial, "dong_tien":cashflows, "ty_le_chiet_khau":discount, "NPV":npv_val, "IRR":irr_val, "Payback":pb, "WACC":wacc}
-            st.markdown('<div class="ai-box">'+call_gemini("Phân tích hiệu quả dự án theo 3 phần: kết quả, nhận xét dễ hiểu và cảnh báo/điểm cần kiểm tra.", payload)+'</div>', unsafe_allow_html=True)
+            payload = {
+                "du_an": project,
+                "von_dau_tu_ban_dau": initial,
+                "dong_tien": cashflows,
+                "ty_le_chiet_khau": discount,
+                "NPV": npv_value,
+                "IRR": irr_value,
+                "Payback": payback,
+                "WACC": wacc_value,
+            }
+            st.markdown(
+                f'<div class="ai-box">{call_gemini("Phân tích hiệu quả dự án theo 3 phần: kết quả, nhận xét dễ hiểu và cảnh báo/điểm cần kiểm tra.", payload)}</div>',
+                unsafe_allow_html=True,
+            )
